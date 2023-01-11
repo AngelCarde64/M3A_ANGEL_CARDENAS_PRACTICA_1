@@ -28,8 +28,8 @@ public class ModeloPersona extends Persona {
     public ModeloPersona() {
     }
 
-    public ModeloPersona(String idPersona, String nombre, String apellido, Date fechanacimiento, String telefono, String sexo, int sueldo, int cupo) {
-        super(idPersona, nombre, apellido, fechanacimiento, telefono, sexo, sueldo, cupo);
+    public ModeloPersona(String idPersona, String nombre, String apellido, Date fechanacimiento, String telefono, String sexo, int sueldo, int cupo, Image foto) {
+        super(idPersona, nombre, apellido, fechanacimiento, telefono, sexo, sueldo, cupo, foto);
     }
 
     public List<Persona> listarPersonas(String filtro) {
@@ -91,9 +91,12 @@ public class ModeloPersona extends Persona {
             System.out.println(ex.getMessage());
         }
         String sql = "INSERT INTO persona (idpersona, nombres, apellidos, fechanacimiento, telefono, sexo, sueldo, cupo, foto)";
-        sql += " VALUES ('" + getIdPersona() + "','" + getNombre() + "','" + getApellido() + "','" + getFechanacimiento()
+
+        Date fechaNac = new java.sql.Date(((Date) getFechanacimiento()).getTime());
+        sql += " VALUES ('" + getIdPersona() + "','" + getNombre() + "','" + getApellido() + "','" + fechaNac
                 + "','" + getTelefono() + "','" + getSexo() + "','" + getSueldo() + "','" + getCupo() + "','" + fotoP + "')";
         return conpg.accion(sql);
+
         //Otra forma de hacer el insert
 //        sql += "VALUES (?,?,?,?,?,?,?,?,?)";
 //
@@ -119,21 +122,24 @@ public class ModeloPersona extends Persona {
 
     public boolean ActualizarDatos() {
         String fotoP = null;
+        if (getFoto() != null) {
+            BufferedImage img = imgBimage(getFoto());
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-        BufferedImage img = imgBimage(getFoto());
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        try {
-            ImageIO.write(img, "PNG", bos);
-            byte[] imgb = bos.toByteArray();
-            fotoP = Base64.encodeBytes(imgb);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            try {
+                ImageIO.write(img, "PNG", bos);
+                byte[] imgb = bos.toByteArray();
+                fotoP = Base64.encodeBytes(imgb);
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
         }
+        Date fechaNac = new java.sql.Date(((Date) getFechanacimiento()).getTime());
 
-        String sql = "UPDATE persona SET nombres =" + getNombre() + ",apellidos = " + getApellido() + ",fechanacimiento = " + getFechanacimiento()
-                + ",telefono = " + getTelefono() + ",sexo = " + getSexo() + ",sueldo = " + getSueldo() + ",cupo = " + getCupo() + ",foto = " + fotoP + "";
-        sql += "WHERE idpersona='" + getIdPersona() + "';";
+        String sql = "UPDATE persona SET nombres = '" + getNombre() + "', apellidos = '" + getApellido() + "', fechanacimiento = '" + fechaNac
+                + "', telefono = '" + getTelefono() + "', sexo = '" + getSexo() + "', sueldo = '" + getSueldo() + "', cupo = '" + getCupo() + "', foto = '" + fotoP + "'";
+        sql += "WHERE idpersona = '" + getIdPersona() + "';";
+        System.out.println("SENTENCIA " + sql);
         return conpg.accion(sql);
     }
 
@@ -141,7 +147,6 @@ public class ModeloPersona extends Persona {
         String sql = "select * from persona where idpersona = '" + id + "'";
         ResultSet rs = conpg.consulta(sql);
         ModeloPersona persona = new ModeloPersona();
-        byte[] bytea;
         try {
             while (rs.next()) {
                 persona.setIdPersona(rs.getString("idpersona"));
@@ -152,16 +157,18 @@ public class ModeloPersona extends Persona {
                 persona.setSexo(rs.getString("sexo"));
                 persona.setSueldo(rs.getInt("sueldo"));
                 persona.setCupo(rs.getInt("cupo"));
-                bytea = rs.getBytes("foto");
-                //si tiene foto
-                try {
-                    if (bytea != null) {
-                        persona.setFoto(obtenerImagen(bytea));
+                byte[] bf = rs.getBytes("foto");
+                if (bf != null) {
+                    bf = Base64.decode(bf, 0, bf.length);
+                    try {
+                        persona.setFoto(obtenerImagen(bf));
+                    } catch (IOException ex) {
+                        persona.setFoto(null);
+                        Logger.getLogger(ModeloPersona.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                } catch (IOException ex) {
-                    Logger.getLogger(ModeloPersona.class.getName()).log(Level.SEVERE, null, ex);
+                } else {
+                    persona.setFoto(null);
                 }
-
             }
         } catch (SQLException ex) {
             Logger.getLogger(ModeloPersona.class.getName()).log(Level.SEVERE, null, ex);

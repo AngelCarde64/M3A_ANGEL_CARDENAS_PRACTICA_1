@@ -16,7 +16,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import Vista.VistaPersona;
 import javax.xml.ws.Holder;
@@ -32,6 +31,7 @@ public class ControllerPersona {
     private ModeloPersona modelo;
     private VistaPersona vista;
     private String id_persona = "", criterio = "";
+    JFileChooser jfc;
 
     public ControllerPersona(ModeloPersona modelo, VistaPersona vista) {
         this.modelo = modelo;
@@ -48,7 +48,7 @@ public class ControllerPersona {
         vista.getBtnCrear().addActionListener(l -> abrirDialogo(1));
         vista.getBtnEditar().addActionListener(l -> abrirDialogo(2));
         //Buttoms pantalla secundaria
-        vista.getBtnAceptar().addActionListener(l -> crearEditarPersona());
+        vista.getBtnAceptar().addActionListener(l -> CrearEditarPersona());
         vista.getBtnCancelar().addActionListener(l -> cancelar());
         //Abrir examinar java
         vista.getBtnExaminar().addActionListener(l -> examinarFoto());
@@ -126,6 +126,7 @@ public class ControllerPersona {
             titulo = "Crear Persona";
             vista.getDlgPersona().setName("C");
             vista.getTxtDni().setEnabled(true);
+            limpiarDatos();
             activarJdialog(titulo);
         } else {
             if (id_persona.equals("")) {
@@ -145,6 +146,7 @@ public class ControllerPersona {
      * ---> Para abrir el panel de editar y mostrar todos los datos
      */
     private void cargarDatos() {
+        limpiarDatos();
         ModeloPersona persona = new ModeloPersona();
         persona = persona.MostrarPersonaAEditar(id_persona);
 
@@ -157,19 +159,19 @@ public class ControllerPersona {
         vista.getTxtSueldo().setText(persona.getSueldo() + "");
         vista.getTxtCupo().setText(persona.getCupo() + "");
 
+        Holder<Integer> i = new Holder<>(0);
         Image foto = persona.getFoto();
-
         if (foto != null) {
             foto = foto.getScaledInstance(90, 120, Image.SCALE_SMOOTH);
             ImageIcon icono = new ImageIcon(foto);
             vista.getLbl_foto().setIcon(icono);
         } else {
-            vista.getLbl_foto().setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Caballo.jpg")));
+            vista.getTblPersonas().setValueAt(null, i.value, 8);
         }
     }
 
     private void examinarFoto() {
-        JFileChooser jfc = new JFileChooser();
+        jfc = new JFileChooser();
         jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             try {
@@ -187,7 +189,7 @@ public class ControllerPersona {
         }
     }
 
-    private void crearEditarPersona() {
+    private void CrearEditarPersona() {
         //registrar
         if (datosNoVacios()) {
             if (vista.getDlgPersona().getName().contentEquals("C")) {
@@ -196,7 +198,6 @@ public class ControllerPersona {
                 if (persona.CrearPersona()) {
                     JOptionPane.showMessageDialog(null,
                             "Persona creada satisfactoriamente.");
-                    limpiarDatos();
                     vista.getDlgPersona().dispose();
                     CargarPersonas();
                 } else {
@@ -216,7 +217,6 @@ public class ControllerPersona {
                 if (persona.ActualizarDatos()) {
                     JOptionPane.showMessageDialog(null,
                             "Persona Modificada satisfactoriamente.");
-                    limpiarDatos();
                     vista.getDlgPersona().dispose();
 
                     CargarPersonas();
@@ -231,7 +231,7 @@ public class ControllerPersona {
     }
 
     //Recupera los datos para ser modificados o creados
-    private ModeloPersona recuperarDatos(ModeloPersona persona) {
+    private ModeloPersona recuperarDatos(ModeloPersona per) {
         //INSERT
         String identificacion = vista.getTxtDni().getText();
         String nombres = vista.getTxtNombre().getText();
@@ -242,26 +242,24 @@ public class ControllerPersona {
         int sueldo = Integer.parseInt(vista.getTxtSueldo().getText());
         int cupo = Integer.parseInt(vista.getTxtCupo().getText());
 
-//        try {
-//            FileInputStream img
-//                    = new FileInputStream(jfc.getSelectedFile());
-//            int largo = (int) jfc.getSelectedFile().length();
-//            persona.setImageFile(img);
-//            persona.setLength(largo);
-//
-//        } catch (IOException ex) {
-//            Logger.getLogger(ControllerPersona.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-        persona.setIdPersona(identificacion);
-        persona.setNombre(nombres);
-        persona.setApellido(apellidos);
-        persona.setFechanacimiento(fechaNac);
-        persona.setTelefono(telefono);
-        persona.setSexo(sexo);
-        persona.setSueldo(sueldo);
-        persona.setCupo(cupo);
+        per.setIdPersona(identificacion);
+        per.setNombre(nombres);
+        per.setApellido(apellidos);
+        per.setFechanacimiento(fechaNac);
+        per.setTelefono(telefono);
+        per.setSexo(sexo);
+        per.setSueldo(sueldo);
+        per.setCupo(cupo);
+        
+        if (vista.getLbl_foto().getIcon() != null) {
+            ImageIcon iconImage = (ImageIcon) vista.getLbl_foto().getIcon();
+            Image image = iconImage.getImage();
+            per.setFoto(image);
+        } else {
+            per.setFoto(null);
+        }
 
-        return persona;
+        return per;
     }
 
     private void eliminar() {
@@ -273,8 +271,7 @@ public class ControllerPersona {
 
             respuesta = JOptionPane.showConfirmDialog(null, "¿Esta seguro?", "Eliminar!", JOptionPane.YES_NO_OPTION);
             if (respuesta == 0) {
-
-                ModeloPersona persona = new ModeloPersona(id_persona, null, null, null, null, null, 0, 0);
+                ModeloPersona persona = new ModeloPersona(id_persona, null, null, null, null, null, 0, 0, null);
 
                 if (persona.deletePersona()) {
                     JOptionPane.showMessageDialog(vista, "Registro Eliminado");
@@ -380,5 +377,6 @@ public class ControllerPersona {
         vista.getjComboBoxSexo().setSelectedItem(1);
         vista.getTxtSueldo().setText("");
         vista.getTxtCupo().setText("");
+        vista.getLbl_foto().setIcon(null);
     }
 }

@@ -15,13 +15,11 @@ public class Persona {
     private int sueldo;
     private int cupo;
     private Image foto;
-    private FileInputStream imageFile;
-    private int length;
 
     public Persona() {
     }
 
-    public Persona(String idPersona, String nombre, String apellido, Date fechanacimiento, String telefono, String sexo, int sueldo, int cupo) {
+    public Persona(String idPersona, String nombre, String apellido, Date fechanacimiento, String telefono, String sexo, int sueldo, int cupo, Image foto) {
         this.idPersona = idPersona;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -30,6 +28,7 @@ public class Persona {
         this.sexo = sexo;
         this.sueldo = sueldo;
         this.cupo = cupo;
+        this.foto = foto;
     }
 
     public int getCupo() {
@@ -102,21 +101,5 @@ public class Persona {
 
     public void setSueldo(int sueldo) {
         this.sueldo = sueldo;
-    }
-
-    public FileInputStream getImageFile() {
-        return imageFile;
-    }
-
-    public void setImageFile(FileInputStream imageFile) {
-        this.imageFile = imageFile;
-    }
-
-    public int getLength() {
-        return length;
-    }
-
-    public void setLength(int length) {
-        this.length = length;
     }
 }

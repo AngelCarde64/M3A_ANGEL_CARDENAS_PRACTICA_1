@@ -39,8 +39,6 @@ public class VistaMP extends javax.swing.JFrame {
         this.jDesktop = jDesktop;
     }
 
-    
-
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -50,10 +48,12 @@ public class VistaMP extends javax.swing.JFrame {
         lblMensaje = new javax.swing.JLabel();
         jToolBar1 = new javax.swing.JToolBar();
         Persona_Button = new javax.swing.JButton();
-        jSeparator1 = new javax.swing.JToolBar.Separator();
-        tlbMC1 = new javax.swing.JButton();
-        tlbMC2 = new javax.swing.JButton();
-        tlbMC3 = new javax.swing.JButton();
+        jSeparator4 = new javax.swing.JToolBar.Separator();
+        tlbAdd = new javax.swing.JButton();
+        jSeparator3 = new javax.swing.JToolBar.Separator();
+        jButtonFile = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JToolBar.Separator();
+        jButtonIMPRIMIR = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenuPersonas = new javax.swing.JMenu();
         jMenuItemCrearPersona = new javax.swing.JMenuItem();
@@ -100,31 +100,51 @@ public class VistaMP extends javax.swing.JFrame {
 
         jToolBar1.setRollover(true);
 
-        Persona_Button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/user.png"))); // NOI18N
-        Persona_Button.setToolTipText("Mantenimiento de Clientes");
+        Persona_Button.setBackground(new java.awt.Color(51, 51, 51));
+        Persona_Button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/follow.png"))); // NOI18N
+        Persona_Button.setBorder(null);
+        Persona_Button.setBorderPainted(false);
         Persona_Button.setFocusable(false);
         Persona_Button.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         Persona_Button.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(Persona_Button);
-        jToolBar1.add(jSeparator1);
+        jToolBar1.add(jSeparator4);
 
-        tlbMC1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/maximize.png"))); // NOI18N
-        tlbMC1.setFocusable(false);
-        tlbMC1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        tlbMC1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar1.add(tlbMC1);
+        tlbAdd.setBackground(new java.awt.Color(51, 51, 51));
+        tlbAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ADD.png"))); // NOI18N
+        tlbAdd.setToolTipText("Mantenimiento de Personas");
+        tlbAdd.setBorder(null);
+        tlbAdd.setBorderPainted(false);
+        tlbAdd.setFocusable(false);
+        tlbAdd.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        tlbAdd.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(tlbAdd);
+        jToolBar1.add(jSeparator3);
 
-        tlbMC2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save.png"))); // NOI18N
-        tlbMC2.setFocusable(false);
-        tlbMC2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        tlbMC2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar1.add(tlbMC2);
+        jButtonFile.setBackground(new java.awt.Color(51, 51, 51));
+        jButtonFile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/FOLDER.png"))); // NOI18N
+        jButtonFile.setBorder(null);
+        jButtonFile.setBorderPainted(false);
+        jButtonFile.setFocusable(false);
+        jButtonFile.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonFile.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jButtonFile);
+        jToolBar1.add(jSeparator2);
 
-        tlbMC3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/time.png"))); // NOI18N
-        tlbMC3.setFocusable(false);
-        tlbMC3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        tlbMC3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar1.add(tlbMC3);
+        jButtonIMPRIMIR.setBackground(new java.awt.Color(51, 51, 51));
+        jButtonIMPRIMIR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/IMPRIMIR.png"))); // NOI18N
+        jButtonIMPRIMIR.setToolTipText("Imprimir el reporte");
+        jButtonIMPRIMIR.setBorder(null);
+        jButtonIMPRIMIR.setBorderPainted(false);
+        jButtonIMPRIMIR.setFocusable(false);
+        jButtonIMPRIMIR.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonIMPRIMIR.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButtonIMPRIMIR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonIMPRIMIRActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButtonIMPRIMIR);
 
         jMenuPersonas.setText("Personas");
 
@@ -199,7 +219,7 @@ public class VistaMP extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jDesktop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jDesktop)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -230,8 +250,14 @@ public class VistaMP extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
+    private void jButtonIMPRIMIRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonIMPRIMIRActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonIMPRIMIRActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Persona_Button;
+    private javax.swing.JButton jButtonFile;
+    private javax.swing.JButton jButtonIMPRIMIR;
     private javax.swing.JDesktopPane jDesktop;
     private javax.swing.JMenu jMenuAyuda;
     private javax.swing.JMenuBar jMenuBar1;
@@ -245,11 +271,11 @@ public class VistaMP extends javax.swing.JFrame {
     private javax.swing.JMenu jMenuSalir;
     private javax.swing.JMenu jMenuVentas;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JToolBar.Separator jSeparator1;
+    private javax.swing.JToolBar.Separator jSeparator2;
+    private javax.swing.JToolBar.Separator jSeparator3;
+    private javax.swing.JToolBar.Separator jSeparator4;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JLabel lblMensaje;
-    private javax.swing.JButton tlbMC1;
-    private javax.swing.JButton tlbMC2;
-    private javax.swing.JButton tlbMC3;
+    private javax.swing.JButton tlbAdd;
     // End of variables declaration//GEN-END:variables
 }

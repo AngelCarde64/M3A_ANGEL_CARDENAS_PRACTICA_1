@@ -49,16 +49,16 @@ public class ConectPG {
     }
 
     // --> Puede ser un SQLException o un boolean
-    public SQLException accion(String sql) {
+    public boolean accion(String sql) {
         try {
             //Puede ser un INSERT-UPDATE-DELETE
             Statement st = con.createStatement();
             st.execute(sql);
             st.close();//Cierrar la conexion.
-            return null;
+            return true;
         } catch (SQLException ex) {
             Logger.getLogger(ConectPG.class.getName()).log(Level.SEVERE, null, ex);
-            return ex;
+            return false;
         }
     }
 

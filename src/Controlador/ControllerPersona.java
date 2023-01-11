@@ -19,13 +19,18 @@ import javax.swing.JLabel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import Vista.VistaPersona;
+import javax.xml.ws.Holder;
 
 public class ControllerPersona {
 
+    /**
+     * **** NOTES **** USO DE HODER ---> La clase Holder es una clase genérica
+     * que se utiliza como un contenedor para almacenar un valor de cualquier
+     * tipo. ->Es comúnmente utilizada cuando se necesita pasar un valor por
+     * referencia a un método o una función, en lugar de pasarlo por valor.
+     */
     private ModeloPersona modelo;
     private VistaPersona vista;
-    private JFileChooser jfc;
-    private int i;
     private String id_persona = "", criterio = "";
 
     public ControllerPersona(ModeloPersona modelo, VistaPersona vista) {
@@ -56,7 +61,7 @@ public class ControllerPersona {
 
         vista.getBtnEliminar().addActionListener(l -> eliminar());
 
-        //busqueda invremental
+        //busqueda incremental
         vista.getTxtBuscar().addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 buscar();
@@ -67,6 +72,7 @@ public class ControllerPersona {
     private void CargarPersonas() {
         // Control para consultar al modelo
         // Y luego en la vista
+        DefaultTableCellRenderer render = new DefaultTableCellRenderer();
         vista.getTblPersonas().setDefaultRenderer(Object.class, new ImagenTabla());
         vista.getTblPersonas().setRowHeight(50);
 
@@ -75,8 +81,8 @@ public class ControllerPersona {
         mTabla = (DefaultTableModel) vista.getTblPersonas().getModel();
         mTabla.setNumRows(0);
 
-        List<Persona> listap = modelo.getListaPersonas();
-        i = 0;
+        List<Persona> listap = modelo.listarPersonas("");
+        Holder<Integer> i = new Holder<>(0);
 
         // Uso de una expresion landa
         listap.stream().forEach(pe -> {
@@ -87,16 +93,15 @@ public class ControllerPersona {
 //            //Llenar imagen
             Image foto = pe.getFoto();
             if (foto != null) {
-                foto = foto.getScaledInstance(50, 75, Image.SCALE_SMOOTH);
-                ImageIcon icono = new ImageIcon(foto);
-                DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
-                dtcr.setIcon(icono);
-                vista.getTblPersonas().setValueAt(new JLabel(icono), i, 8);
+                Image nimg = foto.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+                ImageIcon icono = new ImageIcon(nimg);
+                render.setIcon(icono);
+                vista.getTblPersonas().setValueAt(new JLabel(icono), i.value, 8);
             } else {
-                vista.getTblPersonas().setValueAt(null, i, 8);
+                vista.getTblPersonas().setValueAt(null, i.value, 8);
             }
 
-            i = i + 1;
+            i.value++;
         });
     }
 
@@ -110,31 +115,6 @@ public class ControllerPersona {
     private void cancelar() {
         vista.getDlgPersona().dispose();
         id_persona = "";
-    }
-    
-    //Carga los datos en la pantalla editar
-    private void cargarDatos() {
-        ModeloPersona persona = new ModeloPersona();
-        persona = persona.getPersonaEditar(id_persona);
-
-        vista.getTxtDni().setText(persona.getIdPersona());
-        vista.getTxtNombre().setText(persona.getNombre());
-        vista.getTxtApellido().setText(persona.getApellido());
-        vista.getJdcFechaNac().setDate(persona.getFechanacimiento());
-        vista.getTxtTelefono().setText(persona.getTelefono());
-        vista.getjComboBoxSexo().setSelectedItem(persona.getSexo());
-        vista.getTxtSueldo().setText(persona.getSueldo() + "");
-        vista.getTxtCupo().setText(persona.getCupo() + "");
-        
-        Image foto = persona.getFoto();
-
-        if (foto != null) {
-            foto = foto.getScaledInstance(90, 120, Image.SCALE_SMOOTH);
-            ImageIcon icono = new ImageIcon(foto);
-            vista.getLbl_foto().setIcon(icono);
-        } else {
-            vista.getLbl_foto().setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Caballo.jpg")));
-        }
     }
 
     /**
@@ -160,24 +140,47 @@ public class ControllerPersona {
             }
         }
     }
-    
+
+    /**
+     * ---> Para abrir el panel de editar y mostrar todos los datos
+     */
+    private void cargarDatos() {
+        ModeloPersona persona = new ModeloPersona();
+        persona = persona.MostrarPersonaAEditar(id_persona);
+
+        vista.getTxtDni().setText(persona.getIdPersona());
+        vista.getTxtNombre().setText(persona.getNombre());
+        vista.getTxtApellido().setText(persona.getApellido());
+        vista.getJdcFechaNac().setDate(persona.getFechanacimiento());
+        vista.getTxtTelefono().setText(persona.getTelefono());
+        vista.getjComboBoxSexo().setSelectedItem(persona.getSexo());
+        vista.getTxtSueldo().setText(persona.getSueldo() + "");
+        vista.getTxtCupo().setText(persona.getCupo() + "");
+
+        Image foto = persona.getFoto();
+
+        if (foto != null) {
+            foto = foto.getScaledInstance(90, 120, Image.SCALE_SMOOTH);
+            ImageIcon icono = new ImageIcon(foto);
+            vista.getLbl_foto().setIcon(icono);
+        } else {
+            vista.getLbl_foto().setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Caballo.jpg")));
+        }
+    }
+
     private void examinarFoto() {
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("jpg, png & jpeg", "jpeg", "png", "jpg");
-
-        jfc = new JFileChooser();
-        jfc.setFileFilter(filter);
-        int estado = jfc.showOpenDialog(vista);
-
-        if (estado == JFileChooser.APPROVE_OPTION) {
+        JFileChooser jfc = new JFileChooser();
+        jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             try {
                 Image imagen = ImageIO.read(jfc.getSelectedFile()).getScaledInstance(
                         vista.getLbl_foto().getWidth(),
                         vista.getLbl_foto().getHeight(),
                         Image.SCALE_DEFAULT);
-                Icon icono = new ImageIcon(imagen);
-                vista.getLbl_foto().setIcon(icono);
+                Icon icon = new ImageIcon(imagen);
+                vista.getLbl_foto().setIcon(icon);
                 vista.getLbl_foto().updateUI();
-                vista.getDlgPersona().setVisible(true);
+                // vista.getDlgPersona().setVisible(true);
             } catch (IOException ex) {
                 Logger.getLogger(ControllerPersona.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -190,7 +193,7 @@ public class ControllerPersona {
             if (vista.getDlgPersona().getName().contentEquals("C")) {
                 ModeloPersona persona = new ModeloPersona();
                 persona = recuperarDatos(persona);
-                if (persona.setPersonaFoto()) {
+                if (persona.CrearPersona()) {
                     JOptionPane.showMessageDialog(null,
                             "Persona creada satisfactoriamente.");
                     limpiarDatos();
@@ -227,6 +230,40 @@ public class ControllerPersona {
         }
     }
 
+    //Recupera los datos para ser modificados o creados
+    private ModeloPersona recuperarDatos(ModeloPersona persona) {
+        //INSERT
+        String identificacion = vista.getTxtDni().getText();
+        String nombres = vista.getTxtNombre().getText();
+        String apellidos = vista.getTxtApellido().getText();
+        Date fechaNac = vista.getJdcFechaNac().getDate();
+        String telefono = vista.getTxtTelefono().getText();
+        String sexo = vista.getjComboBoxSexo().getSelectedItem().toString();
+        int sueldo = Integer.parseInt(vista.getTxtSueldo().getText());
+        int cupo = Integer.parseInt(vista.getTxtCupo().getText());
+
+//        try {
+//            FileInputStream img
+//                    = new FileInputStream(jfc.getSelectedFile());
+//            int largo = (int) jfc.getSelectedFile().length();
+//            persona.setImageFile(img);
+//            persona.setLength(largo);
+//
+//        } catch (IOException ex) {
+//            Logger.getLogger(ControllerPersona.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+        persona.setIdPersona(identificacion);
+        persona.setNombre(nombres);
+        persona.setApellido(apellidos);
+        persona.setFechanacimiento(fechaNac);
+        persona.setTelefono(telefono);
+        persona.setSexo(sexo);
+        persona.setSueldo(sueldo);
+        persona.setCupo(cupo);
+
+        return persona;
+    }
+
     private void eliminar() {
         if (id_persona.equals("")) {
             JOptionPane.showMessageDialog(vista, "Selecciona una persona");
@@ -239,7 +276,7 @@ public class ControllerPersona {
 
                 ModeloPersona persona = new ModeloPersona(id_persona, null, null, null, null, null, 0, 0);
 
-                if (persona.deletePersona() == null) {
+                if (persona.deletePersona()) {
                     JOptionPane.showMessageDialog(vista, "Registro Eliminado");
                     id_persona = "";
                     CargarPersonas();
@@ -256,42 +293,9 @@ public class ControllerPersona {
 
     private boolean datosNoVacios() {
         return !vista.getTxtDni().getText().equals("") && !vista.getTxtNombre().getText().equals("") && !vista.getTxtApellido().getText().equals("")
-                && !vista.getJdcFechaNac().toString().equals("") && !vista.getTxtTelefono().getText().equals("") && !vista.getjComboBoxSexo().getSelectedItem().equals("") && !vista.getTxtSueldo().getText().equals("") && !vista.getTxtCupo().getText().equals("");
-    }
-
-    //Recupera los datos para ser modificados o creados
-    private ModeloPersona recuperarDatos(ModeloPersona persona) {
-        //INSERT
-        String identificacion = vista.getTxtDni().getText();
-        String nombres = vista.getTxtNombre().getText();
-        String apellidos = vista.getTxtApellido().getText();
-        Date fechaNac = vista.getJdcFechaNac().getDate();
-        String telefono = vista.getTxtTelefono().getText();
-        String sexo = vista.getjComboBoxSexo().getSelectedItem().toString();
-        int sueldo = Integer.parseInt(vista.getTxtSueldo().getText());
-        int cupo = Integer.parseInt(vista.getTxtCupo().getText());
-
-        try {
-            FileInputStream img
-                    = new FileInputStream(jfc.getSelectedFile());
-            int largo = (int) jfc.getSelectedFile().length();
-            persona.setImageFile(img);
-            persona.setLength(largo);
-
-        } catch (IOException ex) {
-            Logger.getLogger(ControllerPersona.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        persona.setIdPersona(identificacion);
-        persona.setNombre(nombres);
-        persona.setApellido(apellidos);
-        persona.setFechanacimiento(fechaNac);
-        persona.setTelefono(telefono);
-        persona.setSexo(sexo);
-        persona.setSueldo(sueldo);
-        persona.setCupo(cupo);
-
-        return persona;
+                && !vista.getJdcFechaNac().toString().equals("") && !vista.getTxtTelefono().getText().equals("")
+                && !vista.getjComboBoxSexo().getSelectedItem().equals("") && !vista.getTxtSueldo().getText().equals("")
+                && !vista.getTxtCupo().getText().equals("");
     }
 
     private void buscar() {
@@ -309,9 +313,9 @@ public class ControllerPersona {
         DefaultTableModel estructuraTabla;
         estructuraTabla = (DefaultTableModel) vista.getTblPersonas().getModel();
         estructuraTabla.setNumRows(0);
-        List<Persona> listap = modelo.getPersonasBuscar(criterio);
-        i = 0;
+        List<Persona> listap = modelo.listarPersonas(criterio);
 
+        Holder<Integer> i = new Holder<>(0);
         if (!listap.isEmpty()) {
 
             vista.getLblAlerta1().setVisible(false);
@@ -320,28 +324,28 @@ public class ControllerPersona {
                 estructuraTabla.addRow(new Object[3]);
                 vista.getTblPersonas()
                         .setValueAt(persona.getIdPersona(),
-                                i, 0);
+                                i.value, 0);
                 vista.getTblPersonas()
                         .setValueAt(persona.getNombre(),
-                                i, 1);
+                                i.value, 1);
                 vista.getTblPersonas()
                         .setValueAt(persona.getApellido(),
-                                i, 2);
+                                i.value, 2);
                 vista.getTblPersonas()
                         .setValueAt(persona.getFechanacimiento(),
-                                i, 3);
+                                i.value, 3);
                 vista.getTblPersonas()
                         .setValueAt(persona.getTelefono(),
-                                i, 4);
+                                i.value, 4);
                 vista.getTblPersonas()
                         .setValueAt(persona.getSexo(),
-                                i, 5);
+                                i.value, 5);
                 vista.getTblPersonas()
                         .setValueAt(persona.getSueldo(),
-                                i, 6);
+                                i.value, 6);
                 vista.getTblPersonas()
                         .setValueAt(persona.getCupo(),
-                                i, 7);
+                                i.value, 7);
                 //Llenar imagen
                 Image foto = persona.getFoto();
                 if (foto != null) {
@@ -349,12 +353,12 @@ public class ControllerPersona {
                     ImageIcon icono = new ImageIcon(foto);
                     DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
                     dtcr.setIcon(icono);
-                    vista.getTblPersonas().setValueAt(new JLabel(icono), i, 8);
+                    vista.getTblPersonas().setValueAt(new JLabel(icono), i.value, 8);
 
                 } else {
-                    vista.getTblPersonas().setValueAt(null, i, 8);
+                    vista.getTblPersonas().setValueAt(null, i.value, 8);
                 }
-                i = i + 1;
+                i.value++;
             });
         } else {
             vista.getLblAlerta1().setVisible(true);

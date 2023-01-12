@@ -9,5 +9,7 @@ public class Mvc2022 {
         VistaMP vista = new VistaMP();
         ControllerMP controller = new ControllerMP(vista);
         controller.iniciaControl();
+//        Diseño_Punto_De_Venta dise= new Diseño_Punto_De_Venta();
+//        dise.setVisible(true);
     }
 }
